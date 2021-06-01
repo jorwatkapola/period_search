@@ -1,0 +1,10 @@
+drwxrwxr-x    2 ftp      ftp          4096 Jan 31 20:06 .
+drwxrwxr-x   97 ftp      ftp          8192 Jan 31 20:06 ..
+-rw-rw-r--    1 ftp      ftp        429120 Jan 31 20:06 fchart.fts
+-rw-rw-r--    1 ftp      ftp        131140 Jan 31 20:06 fchart.jpg
+-rw-rw-r--    1 ftp      ftp        132890 Jan 31 20:06 fchart.ps.gz
+-rw-rw-r--    1 ftp      ftp         15745 Jan 31 20:06 lcurve.gif
+-rw-rw-r--    1 ftp      ftp         11151 Jan 31 20:06 lcurve.ps.gz
+-rw-rw-r--    1 ftp      ftp         11950 Jan 31 20:06 lcurve_s.gif
+-rw-rw-r--    1 ftp      ftp          5148 Jan 31 20:06 lcurve_s.ps.gz
+-rw-rw-r--    1 ftp      ftp         13360 Jan 31 20:06 phot.dat

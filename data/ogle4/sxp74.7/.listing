@@ -1,0 +1,11 @@
+drwxrwxr-x    2 ftp      ftp          4096 Jan 31  2020 .
+drwxrwxr-x   97 ftp      ftp          8192 Jan 31 20:06 ..
+-rw-rw-r--    1 ftp      ftp        429120 Apr 15  2012 fchart.fts
+-rw-rw-r--    1 ftp      ftp          9571 Apr 15  2012 fchart.jpg
+-rw-rw-r--    1 ftp      ftp          5525 Apr 15  2012 fchart.ps.gz
+-rw-rw-r--    1 ftp      ftp         15116 Jan 31  2020 lcurve.gif
+-rw-rw-r--    1 ftp      ftp         14376 Jan 31  2020 lcurve.ps.gz
+-rw-rw-r--    1 ftp      ftp         10510 Jan 31  2020 lcurve_s.gif
+-rw-rw-r--    1 ftp      ftp          5358 Jan 31  2020 lcurve_s.ps.gz
+-rw-rw-r--    1 ftp      ftp         12888 Jan 31  2020 phot.dat
+-rw-rw-r--    1 ftp      ftp          5551 Mar 24  2017 phot.dat.fix_time_temp

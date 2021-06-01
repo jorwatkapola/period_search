@@ -1,0 +1,649 @@
+%!
+%%Title: Lick Mongo 1990 (proto Touva)
+%%Creator:  ogle@red03                              
+%%CreationDate:  Thu 2009 Apr 16 16:58:10                
+%%Pages: 1
+%%BoundingBox:      0     0   612   792
+%%DocumentFonts: (atend)
+%%EndComments
+ 0.5 setlinewidth
+ 1 setlinecap
+ 1 setlinejoin
+ /NewCenturySchlbk-Roman findfont 15 scalefont setfont
+/L {lineto} bind def /M {moveto} bind def
+/CLR000 { 1.000 1.000 1.000 setrgbcolor} bind def
+/CLR001 { 0.000 0.000 0.000 setrgbcolor} bind def
+%%EndProlog
+%%BeginSetup
+%%BeginPaperSize: letter
+userdict /lettertray known { %if
+    {lettertray} stopped not
+}{ %else
+    false
+} ifelse
+ /ustray exch def
+%%EndPaperSize
+%%EndSetup
+%%Page: 1 1
+/TuvLand false def
+ clippath pathbbox gt
+ TuvLand xor
+ systemdict /setprintermatch known not and
+%{0    612 translate -90 rotate} if pop pop
+ newpath
+  100.00   100.00 M
+  500.00   100.00 L
+  113.33   100.00 M
+  113.33   107.50 L
+  146.67   100.00 M
+  146.67   107.50 L
+  180.00   100.00 M
+  180.00   107.50 L
+  213.33   100.00 M
+  213.33   115.00 L
+  246.67   100.00 M
+  246.67   107.50 L
+  280.00   100.00 M
+  280.00   107.50 L
+  313.33   100.00 M
+  313.33   107.50 L
+  346.67   100.00 M
+  346.67   115.00 L
+  380.00   100.00 M
+  380.00   107.50 L
+  413.33   100.00 M
+  413.33   107.50 L
+  446.67   100.00 M
+  446.67   107.50 L
+  480.00   100.00 M
+  480.00   115.00 L
+ stroke
+ /MongoNormalFont /NewCenturySchlbk-Roman def % Mongo default font
+ /MongoGreekFont /Symbol def     % Mongo Greek font
+ FontDirectory /ZapfChancery-MediumItalic known
+ {/MongoScriptFont /ZapfChancery-MediumItalic def}       % Mongo Script on NTX
+ {/MongoScriptFont /Times-Roman def}                     % Mongo Serif
+ ifelse
+ /MongoTinyFont /Courier def     % Mongo Typewriter font
+ /MongoLabelDict 70 dict def
+ % Put a bunch of variables into our own dictionary
+ /MongoLabelStartup {
+ MongoLabelDict begin
+ /ptsize 0 def                   % Text point size passed to MongoPutlabel
+ /rotcode 0 def                  % Rotation angle passed to MongoPutlabel
+ /hpos 0 def                     % Horizontal position passed to MongoPutlabel
+ /vpos 0 def                     % Vertical position passed to MongoPutlabel
+ /modechar 92 def                % The backslash = 92
+ /modecount 0 def                % Counts occurances of modechar
+ /mode 0 def                     % 0 = normal mode
+ 				% 1 = Special font for 1 character
+ 				% 2 = Special font permanent
+ /submode 0 def                  % 0 = not super/sub
+ 				% 1 = super/sub for 1 character
+ 				% 2 = super/sub permanent
+ /superlevel 0 def               % super/sub level counter
+ 				% >0 means superscript
+ 				% <0 means subscript
+ /supershift 0.55 def            % Percent of font height to shift super/sub
+ /superscale 1.67 def            % Font scale factor for super/sub
+ /voff 0 def                     % Vertical offset for super/sub
+ /curpt 1 def                    % Current font scale factor
+ /curheight 1 def                % Height of font with current scaling
+ /fontnum 0 def                  % 0 = normal font
+ 				% 1 = Roman font
+ 				% 2 = Greek font
+ 				% 3 = Script font
+ 				% 4 = Tiny font
+ /italmode 0 def                 % 0 = not italicized
+ 				% 1 = italicized 1 char
+ 				% 2 = italicized permanent
+ /literalmode 0 def              % Set for literal octal code evaluation
+ /cfontnum 0 def                 % Current font number
+ /citalang 0 def                 % Last angle for italics mode
+ /cptsize 0 def                  % Last point size used
+ /italang 0 def                  % New angle for italics mode
+ /tanang 20 dup sin exch cos div def % Tangent of italics angle
+ /fsize 0 def                    % Temporary for font scale
+ /xlen 0 def                     % Length of string in points
+ /ylen 0 def                     % Height of string in points
+ /xadj 0 def                     % Text horizontal offset
+ /yadj 0 def                     % Text vertical offset
+ /romanchar (r) 0 get def        % Character value for Roman font mode
+ /greekchar (g) 0 get def        % Character value for Greek font mode
+ /italchar (i) 0 get def         % Character value for italics mode
+ /scriptchar (s) 0 get def       % Character value for script font
+ /tinychar (t) 0 get def         % Character value for tiny font
+ /usuperchar (U) 0 get def        % Character value for superscript mode
+ /usubchar (D) 0 get def          % Character value for subscript mode
+ /superchar (u) 0 get def        % Character value for superscript mode
+ /subchar (d) 0 get def          % Character value for subscript mode
+ /zerochar (0) 0 get def         % 0 character code
+ /sevenchar (7) 0 get def        % 7 character code
+ /xjustcode 0 def                % Horizontal centering code
+ /yjustcode 0 def                % Vertical centering code
+ /ybot 0 def                     % Bottom of text
+ /ycen 0 def                     % Center of text
+ /ycap 0 def                     % Top of capital letters
+ /ytop 0 def                     % Top of font
+ /charcode 0 def                 % Used by dochar routine
+ /charval 0 def                  % Used by dochar to build literal code values
+ /debugline 720 def
+ % enter with (string)
+ %/debug {
+ %       gsave
+ %       72 debugline translate
+ %       0 0 moveto
+ %       show
+ %       grestore
+ %       /debugline debugline 20 sub def
+ %} def
+ % Print the string on the stack
+ /doprint {
+ 	gsave
+ 	hpos vpos translate
+ 	rotcode rotate
+ 	xadj xlen add yadj voff add moveto
+ 	show
+ 	grestore
+ } def
+ % Determine the text adjustment parameters based on the centering code
+ /SetXYadj {
+ %       /yadj                           % First vertical centering
+ %       justcode 4 lt
+ %               {ylen neg def}
+ %               {justcode 7 lt
+ %                       {ylen -2 div def}
+ %                       {0 def}
+ %                ifelse}
+ %       ifelse
+ %       /xadj                           % Then horizontal centering
+ %       justcode 2 add 3 mod 0 eq
+ %               {xlen neg def}
+ %               {justcode 1 add 3 mod 0 eq
+ %                       {xlen -2 div def}
+ %                       {0 def}
+ %                ifelse}
+ %       ifelse
+ 	/yadj                           % First vertical centering
+ 	yjustcode -2 eq
+ 		{ybot}
+ 		{yjustcode -1 eq
+ 			{0}
+ 			{yjustcode 0 eq
+ 				{ycen}
+ 				{yjustcode 1 eq
+ 					{ycap}
+ 					{ytop}
+ 				 ifelse}
+ 			 ifelse}
+ 		 ifelse}
+ 	ifelse
+ 	neg def
+ 	/xadj                           % Then horizontal centering
+ 	xjustcode 1 add xlen mul -2 div def
+ } def
+ % Define the current font and save the specifications for the font
+ % Enter with font name and scale on the stack
+ /DoFont {
+ 	/cptsize exch def               % Save font scale
+ 	/cfontnum fontnum def           % Save Current font number
+ 	/citalang italang def           % Save italics angle
+ %       Now create the new current font
+ 	findfont [ cptsize 0 italang cptsize 0 0 ] makefont setfont
+ } def
+ % Set the italics angle and call DoFont if a new font is needed
+ % Enter with font name and scale on the stack
+ % italang is set to the fontscale * tan(italics angle)
+ /SetupFont {
+ 	dup /italang exch
+ 	italmode 0 ne
+ 		{ tanang mul def}       % tan(angle) * scale
+ 		{ pop 0 def}            % 0 degree (not italic)
+ 	ifelse
+ 	dup
+ 	fontnum cfontnum eq exch        % Did font change?
+ 	italang citalang eq exch        % Did italic state change?
+ 	cptsize eq                      % Did point size change?
+ 	and and
+ 		{pop pop}               % Nothing changed - just clean up
+ 		{DoFont}                % Set a new font
+ 	ifelse
+ } def
+ % Select a font based on the font number
+ /SelectFont {
+ 	ptsize curpt mul                % Scale to default point size
+ 	fontnum 0 eq
+ 		{MongoNormalFont exch SetupFont}
+ 		{fontnum 1 eq
+ 			{MongoGreekFont exch SetupFont}
+ 			{fontnum 2 eq
+ 				{MongoScriptFont exch SetupFont}
+ %                               {MongoTinyFont exch 0.5 mul SetupFont}
+ %       The tiny font is really the typewriter font, same size as all
+ 				{MongoTinyFont exch SetupFont}
+ 			 ifelse}
+ 		 ifelse}
+ 	ifelse
+ } def
+ % Enter with character code on the stack
+ /dochar {
+ 	/charcode exch def              % Save the character code
+ 	literalmode 0 ne
+ 		{literalmode 3 eq
+ 			{/charval 0 def}
+ 		 if
+ 		/charval charval 8 mul charcode zerochar sub 7 and add def
+ 		/literalmode literalmode 1 sub def
+ 		literalmode 0 eq
+ 			{/charcode charval def}
+ 		if
+ 	} if
+ 	literalmode 0 eq
+ 	{
+ 	SelectFont                      % Check and set font
+ 	/thechar ( ) dup 0 charcode put def % Generate 1-character string
+ 	printit 1 eq {thechar doprint} if       % Print it if required
+ 	thechar stringwidth             % Get its width
+ 	pop xlen add /xlen exch def     % Add it to total string width
+ %       Reset various modes if turned on for a single character
+ 	italmode 1 eq {/italmode 0 def} if
+ 	submode 1 eq {-1 SetSuperSub /submode 0 def} if
+ 	submode -1 eq {1 SetSuperSub /submode 0 def} if
+ 	mode 1 eq {/fontnum 0 def /mode 0 def} if
+ 	} if
+ } def
+ % Compute current height of the font (assumed to be height of '[')
+ /GetCurheight {
+ 	gsave
+ 	newpath
+ 	0 0 moveto
+ 	([) true charpath flattenpath pathbbox
+ 	/ycap exch def pop /ybot exch def pop
+ 	/ytop ptsize ybot add def
+ 	/ycen ycap 2 div def
+ %       exch pop sub neg exch pop
+ 	ycap ybot sub
+ 	grestore
+ } def
+ % Increment the modecount unless it will become too big.
+ /countmode {
+ 	modecount 1 gt
+ 		{modechar dochar        % An error - print a backslash
+ 		/modecount 0 def}
+ 		{/modecount modecount 1 add def}
+ 		ifelse
+ } def
+ /ResetModecount {
+ 	/mode modecount def
+ 	/modecount 0 def
+ } def
+ % Turn italics mode on for one character, or permanently, or turn it off.
+ /SetItalmode {
+ %       (In SetItalmode) debug
+ 	modecount 1 eq
+ 		{italmode 2 ne {/italmode 1 def} if} % On for one char
+ 		{italmode 2 eq
+ 			{/italmode 0 def}       % Turn off
+ 			{/italmode 2 def}       % On permanently
+ 		ifelse}
+ 	ifelse
+ 	/modecount 0 def
+ } def
+ % Enter with superlevel increment (+1 or -1) on the stack
+ /SetSuperSub {
+ %       Here we compute the new vertical offset and font scale factor
+ 	dup 0 gt
+ 		{
+ 		/voff voff supershift curheight curpt mul mul add def
+ 		superlevel 0 ge
+ 			{/curpt curpt superscale div def}
+ 			{/curpt curpt superscale mul def}
+ 		ifelse
+ 		}
+ 		{
+ 		superlevel 0 gt
+ 			{/curpt curpt superscale mul def}
+ 			{/curpt curpt superscale div def}
+ 		ifelse
+ 		/voff voff supershift curheight curpt mul mul sub def
+ 		}
+ 	ifelse
+ 	dup superlevel add /superlevel exch def
+ 	modecount mul /submode exch def
+ 	/modecount 0 def
+ } def
+ % Check for control characters.
+ /setmode {
+ 	c romanchar eq
+ 	    {/fontnum 0 def ResetModecount}
+ 	    {c greekchar eq
+ 		{/fontnum 1 def ResetModecount}
+ 		{c scriptchar eq
+ 		    {/fontnum 2 def ResetModecount}
+ 		    {c tinychar eq
+ 			{/fontnum 3 def ResetModecount}
+ 			{c italchar eq
+ 			    {SetItalmode}
+ 			    {c superchar eq c usuperchar eq or
+ 				{1 SetSuperSub}
+ 				{c subchar eq c usubchar eq or
+ 				    {-1 SetSuperSub}
+ 				    {c zerochar ge c sevenchar le and
+ 					{/literalmode 3 def
+ 					 c dochar
+ 					 /modecount 0 def}
+ 					{1 1 modecount {modechar dochar} for
+ 					 c dochar}
+ 				    ifelse}
+ 				ifelse}
+ 			    ifelse}
+ 			ifelse}
+ 		    ifelse}
+ 		ifelse}
+ 	    ifelse}
+ 	ifelse
+ } def
+ % Enter with string on the stack
+ /MongoStringWidth {
+     {
+ 	/c exch def             % Put character code in c
+ 	c modechar eq           % Check for backslash
+ 		{countmode}     % Backslash seen - Bump count
+ 		{modecount 0 gt % No backslash
+ 			{setmode}  %But backslash recently seen - Set new mode
+ 			{c dochar} % Regular character
+ 		ifelse}
+ 	ifelse
+     } forall
+ } def
+ % Called to reset a few things for each pass through MongoStringWidth
+ /InitAll {
+ 	/italang 0 def
+ 	/italmode 0 def
+ 	/xlen 0 def
+ 	/submode 0 def
+ 	/superlevel 0 def
+ 	/mode 0 def
+ 	/modecount 0 def
+ 	/voff 0 def
+ 	/curpt 1 def
+ 	/fontnum 0 def
+ 	/literalmode 0 def
+ 	MongoNormalFont ptsize DoFont
+ } def
+ end
+ } def
+ % Input:
+ %       hpos vpos xjust yjust rot ptsize (text) putlabel
+ /MongoPutlabel {
+ 	gsave
+ 	MongoLabelStartup               % Set up our dictionary
+ 	MongoLabelDict begin            % Invoke our dictionary
+ 	/textstr exch def               % Save all parameters - the text
+ 	/ptsize exch def                % Point size of characters
+ 	/rotcode exch def               % Rotation angle
+ 	/yjustcode exch def             % Justification code vertically
+ 	/xjustcode exch def             % Justification code horizontally
+ 	/vpos exch def                  % Vertical position
+ 	/hpos exch def                  % Horizontal position
+ 	InitAll                         % Initialize a few critical values
+ 	/curheight GetCurheight def     % Find character height
+ 	/ylen curheight def             % Height of string in points
+ 	/printit 0 def                  % First pass just get length
+ 	textstr MongoStringWidth        % Do it!
+ 	SetXYadj                        % Compute text centering values
+ 	InitAll                         % Reset critical values again
+ 	/printit 1 def                  % Now print
+ 	textstr MongoStringWidth        % DO IT!!
+ 	end                             % Pop dictionary
+ 	grestore
+ } def
+  213.3   85.0    0.0   0      0.00     15.00 (4900) MongoPutlabel
+  346.7   85.0    0.0   0      0.00     15.00 (4920) MongoPutlabel
+  480.0   85.0    0.0   0      0.00     15.00 (4940) MongoPutlabel
+ newpath
+  100.00   400.00 M
+  500.00   400.00 L
+  113.33   400.00 M
+  113.33   392.50 L
+  146.67   400.00 M
+  146.67   392.50 L
+  180.00   400.00 M
+  180.00   392.50 L
+  213.33   400.00 M
+  213.33   385.00 L
+  246.67   400.00 M
+  246.67   392.50 L
+  280.00   400.00 M
+  280.00   392.50 L
+  313.33   400.00 M
+  313.33   392.50 L
+  346.67   400.00 M
+  346.67   385.00 L
+  380.00   400.00 M
+  380.00   392.50 L
+  413.33   400.00 M
+  413.33   392.50 L
+  446.67   400.00 M
+  446.67   392.50 L
+  480.00   400.00 M
+  480.00   385.00 L
+  100.00   100.00 M
+  100.00   400.00 L
+  100.00   107.15 M
+  107.50   107.15 L
+  100.00   119.06 M
+  115.00   119.06 L
+  100.00   130.98 M
+  107.50   130.98 L
+  100.00   142.89 M
+  107.50   142.89 L
+  100.00   154.81 M
+  107.50   154.81 L
+  100.00   166.72 M
+  115.00   166.72 L
+  100.00   178.63 M
+  107.50   178.63 L
+  100.00   190.55 M
+  107.50   190.55 L
+  100.00   202.46 M
+  107.50   202.46 L
+  100.00   214.38 M
+  115.00   214.38 L
+  100.00   226.29 M
+  107.50   226.29 L
+  100.00   238.20 M
+  107.50   238.20 L
+  100.00   250.12 M
+  107.50   250.12 L
+  100.00   262.03 M
+  115.00   262.03 L
+  100.00   273.95 M
+  107.50   273.95 L
+  100.00   285.86 M
+  107.50   285.86 L
+  100.00   297.78 M
+  107.50   297.78 L
+  100.00   309.69 M
+  115.00   309.69 L
+  100.00   321.60 M
+  107.50   321.60 L
+  100.00   333.52 M
+  107.50   333.52 L
+  100.00   345.43 M
+  107.50   345.43 L
+  100.00   357.35 M
+  115.00   357.35 L
+  100.00   369.26 M
+  107.50   369.26 L
+  100.00   381.18 M
+  107.50   381.18 L
+  100.00   393.09 M
+  107.50   393.09 L
+ stroke
+   92.5  119.1    1.0   0      0.00     15.00 (15.6) MongoPutlabel
+   92.5  166.7    1.0   0      0.00     15.00 (15.4) MongoPutlabel
+   92.5  214.4    1.0   0      0.00     15.00 (15.2) MongoPutlabel
+   92.5  262.0    1.0   0      0.00     15.00 (15) MongoPutlabel
+   92.5  309.7    1.0   0      0.00     15.00 (14.8) MongoPutlabel
+   92.5  357.3    1.0   0      0.00     15.00 (14.6) MongoPutlabel
+ newpath
+  500.00   100.00 M
+  500.00   400.00 L
+  500.00   107.15 M
+  492.50   107.15 L
+  500.00   119.06 M
+  485.00   119.06 L
+  500.00   130.98 M
+  492.50   130.98 L
+  500.00   142.89 M
+  492.50   142.89 L
+  500.00   154.81 M
+  492.50   154.81 L
+  500.00   166.72 M
+  485.00   166.72 L
+  500.00   178.63 M
+  492.50   178.63 L
+  500.00   190.55 M
+  492.50   190.55 L
+  500.00   202.46 M
+  492.50   202.46 L
+  500.00   214.38 M
+  485.00   214.38 L
+  500.00   226.29 M
+  492.50   226.29 L
+  500.00   238.20 M
+  492.50   238.20 L
+  500.00   250.12 M
+  492.50   250.12 L
+  500.00   262.03 M
+  485.00   262.03 L
+  500.00   273.95 M
+  492.50   273.95 L
+  500.00   285.86 M
+  492.50   285.86 L
+  500.00   297.78 M
+  492.50   297.78 L
+  500.00   309.69 M
+  485.00   309.69 L
+  500.00   321.60 M
+  492.50   321.60 L
+  500.00   333.52 M
+  492.50   333.52 L
+  500.00   345.43 M
+  492.50   345.43 L
+  500.00   357.35 M
+  485.00   357.35 L
+  500.00   369.26 M
+  492.50   369.26 L
+  500.00   381.18 M
+  492.50   381.18 L
+  500.00   393.09 M
+  492.50   393.09 L
+ stroke
+  300.0  422.5    0.0   0      0.00     15.00 (RX-J0544.1-7100) MongoPutlabel
+  300.0   70.0    0.0   2      0.00     15.00 (HJD - 2450000) MongoPutlabel
+   46.0  250.0    0.0   0     90.00     15.00 (I magnitude) MongoPutlabel
+ % DoDot Macro
+ /DoDotDict 20 dict def
+ /DoDot {
+ DoDotDict begin
+ /expand exch def /ptype exch def
+ /nvert exch def /rot exch def
+ /ydot exch def /xdot exch def
+ gsave
+ xdot ydot translate
+ rot rotate
+ % set default point radius
+ /orad 5.0 expand mul def
+ % set stellated inner radius
+ /irad 1.25 expand mul def
+ /dang 360. nvert div def
+ /bang -90. dang 0.5 mul add def
+ /eang 270. dang 0.5 mul sub def
+ /xv orad bang cos mul def
+ /yv orad bang sin mul def
+ newpath xv yv moveto
+ ptype 0 eq ptype 3 eq or {
+ bang dang add dang eang {dup sin exch cos
+ /xv exch orad mul def
+ /yv exch orad mul def
+ xv yv lineto } for
+ closepath
+ ptype 0 eq {stroke} if
+ ptype 3 eq {gsave
+ 0 setgray fill grestore}
+ if} if
+ ptype 1 eq {
+ bang dang add dang eang {dup sin exch cos
+ /xv exch orad mul def
+ /yv exch orad mul def
+ 0 0 lineto xv yv moveto } for
+ 0 0 lineto stroke} if
+ ptype 2 eq {/hang dang 0.5 mul def
+ bang dang eang {dup hang add dup sin exch cos
+ /xv exch irad mul def
+ /yv exch irad mul def
+ xv yv lineto
+ dang add dup sin exch cos
+ /xv exch orad mul def
+ /yv exch orad mul def
+ xv yv lineto } for
+ stroke}if
+ grestore end } def
+ %
+newpath
+   100.00    100.00 M
+   500.00    100.00 L
+   500.00    400.00 L
+   100.00    400.00 L
+closepath clip
+    11.60   302.30     0.00  10  3     0.40 DoDot
+    44.54   302.54     0.00  10  3     0.40 DoDot
+    71.35   298.73     0.00  10  3     0.40 DoDot
+   123.68   294.68     0.00  10  3     0.40 DoDot
+   150.67   299.68     0.00  10  3     0.40 DoDot
+   350.81   278.00     0.00  10  3     0.40 DoDot
+   390.52   284.19     0.00  10  3     0.40 DoDot
+   437.26   278.48     0.00  10  3     0.40 DoDot
+    11.60   301.59     0.00   2  0     0.40 DoDot
+    44.54   301.83     0.00   2  0     0.40 DoDot
+    71.35   298.25     0.00   2  0     0.40 DoDot
+ newpath
+  123.68   294.68 M
+  123.68   293.96 L
+   123.68   293.96     0.00   2  0     0.40 DoDot
+  150.67   299.68 M
+  150.67   299.21 L
+   150.67   299.21     0.00   2  0     0.40 DoDot
+  350.81   278.00 M
+  350.81   277.28 L
+   350.81   277.28     0.00   2  0     0.40 DoDot
+  390.52   284.19 M
+  390.52   283.48 L
+   390.52   283.48     0.00   2  0     0.40 DoDot
+  437.26   278.48 M
+  437.26   277.76 L
+   437.26   277.76     0.00   2  0     0.40 DoDot
+    11.60   303.02     0.00   2  0     0.40 DoDot
+    44.54   303.26     0.00   2  0     0.40 DoDot
+    71.35   299.21     0.00   2  0     0.40 DoDot
+  123.68   294.68 M
+  123.68   295.39 L
+   123.68   295.39     0.00   2  0     0.40 DoDot
+  150.67   299.68 M
+  150.67   300.16 L
+   150.67   300.16     0.00   2  0     0.40 DoDot
+  350.81   278.00 M
+  350.81   278.71 L
+   350.81   278.71     0.00   2  0     0.40 DoDot
+  390.52   284.19 M
+  390.52   284.91 L
+   390.52   284.91     0.00   2  0     0.40 DoDot
+  437.26   278.48 M
+  437.26   279.19 L
+   437.26   279.19     0.00   2  0     0.40 DoDot
+ stroke
+ showpage
+%%Trailer
+%%DocumentFonts: NewCenturySchlbk-Roman
