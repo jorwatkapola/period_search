@@ -1,5 +1,5 @@
 import cython
-import wwzs
+import wwzp
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
@@ -46,7 +46,7 @@ parallel = True
 
 
 # Using the above settings, we will now compute the WWZ/WWA for the full timeseries and removed timeseries
-wwt_spec_Nyq = wwzs.wwt(timestamps=x,
+wwt_spec_Nyq = wwzp.wwt(timestamps=x,
                      magnitudes=y,
                      time_divisions=ntau,
                      freq_params=frequency_parameters,

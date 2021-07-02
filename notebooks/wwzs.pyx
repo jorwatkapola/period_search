@@ -133,6 +133,7 @@ cpdef tau_loop(float dtau, cnp.ndarray freq, cnp.ndarray timestamps, cnp.ndarray
                 print("determinant is zero, using pseudo-inverse.")
             else:
                 dmat = np.linalg.inv(dmat)
+#             dmat = np.linalg.pinv(dmat)
 
             # set dcoef and dpower
             dcoef = dmat.dot(dvec)  # y1, y2, and y3 from eq. 4-4, with 5-5, 6, 7
