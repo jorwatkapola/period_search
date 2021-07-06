@@ -148,7 +148,6 @@ def log_plotter(ax: axes, TAU: np.ndarray, FREQ: np.ndarray, DATA: np.ndarray, c
     in terms of frequency but a secondary y axis also shows corresponding period values
     """
 
-    fig, ax = plt.subplots(nrows=1, sharex=False, figsize=[13, 10])
     masked_plotter(ax, TAU, FREQ, DATA, clip)
     ax.set_yscale('log')
     def forward(x):
