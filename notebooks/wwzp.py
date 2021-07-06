@@ -92,9 +92,15 @@ def wwt(timestamps: np.ndarray,
             # parallelise the loop going over idat 
             dz: np.ndarray = domega * (timestamps - dtau)
             dweight: np.ndarray = np.exp(-1 * decay_constant * dz ** 2)
-#             dweight_mask = dweight > 10 ** -9
+            dweight_mask = dweight <= 10 ** -9
+            dweight[dweight_mask] = 0
+            # if dweight > 10 ** -9
             cos_dz: np.ndarray = np.cos(dz)
             sin_dz: np.ndarray = np.sin(dz)
+            cos_dz[dweight_mask] = 0
+            sin_dz[dweight_mask] = 0
+                
+#             print(dweight_mask.sum())
             dweight2 = np.sum(dweight ** 2)
             dvarw = np.sum(dweight * magnitudes ** 2)
             dmat[0, 0] = np.sum(dweight)

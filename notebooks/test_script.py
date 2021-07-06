@@ -1,5 +1,5 @@
 import cython
-import wwzp
+import wwzs
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
@@ -46,12 +46,12 @@ parallel = True
 
 
 # Using the above settings, we will now compute the WWZ/WWA for the full timeseries and removed timeseries
-wwt_spec_Nyq = wwzp.wwt(timestamps=x,
+wwt_spec_Nyq = wwzs.wwt(timestamps=x,
                      magnitudes=y,
                      time_divisions=ntau,
                      freq_params=frequency_parameters,
                      decay_constant=decay_constant)
-
+                        #, parallel=False)
 
 def make_tau_plot_grid(tau_mat: np.ndarray) -> np.ndarray:
     """
@@ -111,7 +111,7 @@ def linear_plotter_log_1(ax: axes, TAU: np.ndarray, FREQ: np.ndarray, DATA: np.n
     :return:
     """
     #mask zero values, required to allow log scale axis
-    DATA_masked = np.ma.masked_where(DATA == 0, DATA)
+    DATA_masked = np.ma.masked_where(DATA == 0., DATA)
     data_mean = DATA_masked.mean()
     data_std = DATA_masked.std()
     if clip:
