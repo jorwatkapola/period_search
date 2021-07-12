@@ -119,6 +119,7 @@ def wwt(timestamps: np.ndarray,
     :param parallel: boolean indicate to use parallel processing or not
     :return: Tau, Freq, WWZ, AMP, COEF, NEFF in a numpy array
     """
+#     returned=[]###del
 
     # Starting Weighted Wavelet Z-transform and start timer...
     print("*** Starting Weighted Wavelet Z-transform ***\n")
@@ -172,8 +173,10 @@ def wwt(timestamps: np.ndarray,
         # Initialize the outputs for each iteration
         index: int = 0
         output: np.ndarray = np.empty((len(freq), 6))
-        nstart: int = 1
-        dvarw: float = 0.0
+        nstart: int = 0
+#         dvarw: float = 0.0
+            
+#         dvarw_list = [] ###del
 
         # loop over each interested "frequency" over the "time shifts"
         for dfreq in freq:
@@ -181,8 +184,12 @@ def wwt(timestamps: np.ndarray,
             dvec: np.ndarray = np.zeros(3)
             dmat: np.ndarray = np.zeros([3, 3])
             dweight2: float = 0.0
+            dweight_sum: float = 0.0
             # Get Scale Factor (referred in paper as "frequency")
             domega: float = 2.0 * np.pi * dfreq
+            dvarw: float = 0.0
+                
+#             dvarw_sublist = [] ###del
 
             # Discrete wavelet transform (DWT)
             # Lots of math here, but basically doing the summations shown in the paper
@@ -193,12 +200,14 @@ def wwt(timestamps: np.ndarray,
 
                 # get upper triangular matrix of the weights and vector
                 # These are used later to calculate Neff, DWT, DWP, etc in the paper
+                
+                
                 if dweight > 10 ** -9:
                     cos_dz: float = np.cos(dz)
                     sin_dz: float = np.sin(dz)
                     dweight2 += dweight ** 2
                     dvarw += dweight * magnitudes[idat] ** 2  # Used to get "weighted variation" later
-
+                    dweight_sum += dweight
                     dmat[0, 0] += dweight
                     dmat[0, 1] += dweight * cos_dz
                     dmat[0, 2] += dweight * sin_dz
@@ -210,11 +219,17 @@ def wwt(timestamps: np.ndarray,
                     dvec[0] += dweight * magnitudes[idat]
                     dvec[1] += dweight * magnitudes[idat] * cos_dz
                     dvec[2] += dweight * magnitudes[idat] * sin_dz
+                    
+#             returned.append(dvarw)###del
+#                 else:
+#                     returned.append(0.)
 
-                elif dz > 0:
-                    break
-                else:
-                    nstart = idat + 1
+#                 elif dz > 0:
+#                     break
+#                 else:
+#                     nstart = idat + 1
+                   
+            
 
             # Get dneff ("effective number" for weighted projection)
             if dweight2 > 0:
@@ -235,14 +250,20 @@ def wwt(timestamps: np.ndarray,
                     dvarw = dvarw / dmat[0, 0]
                 else:
                     dvarw = 0.0
+                    
+#                 dvarw_list.append(dvarw)###del
 
                 # some initialize
                 dmat[0, 0] = 1.0
                 davew: float = dvec[0]
                 dvarw = dvarw - (davew ** 2)  # "weighted variation" eq. 5-9
+                
+#                 dvarw_list.append(dvarw)###del
 
                 if dvarw <= 0.0:
                     dvarw = 10 ** -12
+                    
+#                 dvarw_list.append(dvarw)###del
 
                 # avoid for loops
                 dmat[1, 0] = dmat[0, 1]
@@ -278,13 +299,22 @@ def wwt(timestamps: np.ndarray,
             output[index] = [dtau, dfreq, dpowz, damp, dcoef[0], dneff]
 
             index = index + 1
-
+            
+#             returned.append(dvarw_list)#del
+#         return returned###del
         return output
 
     # Check if parallel or not
     if parallel:
         output = np.array(Parallel(n_jobs=num_cores)(delayed(tau_loop)(dtau) for dtau in tau))
     else:
+        
+        ###del
+#         for i, dtau in enumerate(tau):
+#             tau_loop(dtau)
+#         return returned
+        ###del
+        
         output = np.empty([ntau, nfreq, 6])
         for i, dtau in enumerate(tau):
             output[i] = tau_loop(dtau)

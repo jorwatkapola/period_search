@@ -333,7 +333,7 @@ def wwt(timestamps: np.ndarray,
     :param parallel: boolean indicate to use parallel processing or not
     :return: Tau, Freq, WWZ, AMP, COEF, NEFF in a numpy array
     """
-
+#     returned=[]#del
     # Starting Weighted Wavelet Z-transform and start timer...
     print("*** Starting Weighted Wavelet Z-transform ***\n")
     process_starttime: float = time.time()
@@ -342,19 +342,39 @@ def wwt(timestamps: np.ndarray,
     tau: np.ndarray = make_tau(timestamps, time_divisions)
     ntau: int = len(tau)
 
+    # Calculate pseudo sample rate and largest time window to check for requirements
+    freq_pseudo_sr = 1 / np.median(np.diff(timestamps))  # 1 / median period
+
+    # noinspection PyArgumentList
+    largest_tau_window = tau[1] - tau[0]
+    print('Pseudo sample frequency (median) is ', np.round(freq_pseudo_sr, 3))
+    print('largest tau window is ', np.round(largest_tau_window, 3))
+
     # Frequencies to compute WWZ
-    freq = freq_params
-#     freq: np.ndarray = make_freq(freq_low=freq_params[0],  # pull this outside of the function
-#                                  freq_high=freq_params[1],
-#                                  freq_steps=freq_params[2])
-    nfreq: int = len(freq)
+    if method == 'linear':
+        freq: np.ndarray = freq_params # edited - directly feed in frequency steps
+        # freq: np.ndarray = make_freq(freq_low=freq_params[0],
+        #                              freq_high=freq_params[1],
+        #                              freq_steps=freq_params[2])
+        nfreq: int = len(freq)
+
+    elif method == 'octave':
+        freq = make_octave_freq(freq_target=freq_params[0],
+                                freq_low=freq_params[1],
+                                freq_high=freq_params[2],
+                                band_order=freq_params[3],
+                                log_scale_base=freq_params[4],
+                                freq_pseudo_sr=freq_pseudo_sr,
+                                largest_tau_window=largest_tau_window,
+                                override=freq_params[5])
+        nfreq = len(freq)
 
     # Get number of data from timestamps
     numdat: int = len(timestamps)
 
     # Get number of CPU cores on current device (used for parallel)
     num_cores = multiprocessing.cpu_count()
-    
+
     # WWT Stars Here
     def tau_loop(dtau):
         """
@@ -366,8 +386,10 @@ def wwt(timestamps: np.ndarray,
         # Initialize the outputs for each iteration
         index: int = 0
         output: np.ndarray = np.empty((len(freq), 6))
-        nstart: int = 1
+        nstart: int = 0
         dvarw: float = 0.0
+            
+#         dvarw_list = [] ###del
 
         # loop over each interested "frequency" over the "time shifts"
         for dfreq in freq:
@@ -377,7 +399,7 @@ def wwt(timestamps: np.ndarray,
             dweight2: float = 0.0
             # Get Scale Factor (referred in paper as "frequency")
             domega: float = 2.0 * np.pi * dfreq
-            
+           
             # Discrete wavelet transform (DWT)
             # Lots of math here, but basically doing the summations shown in the paper
             # parallelise the loop going over idat 
@@ -386,15 +408,15 @@ def wwt(timestamps: np.ndarray,
             # in the loop values with weights less than 1E-9 would be
             # excluded from the summation loop, so here we set them to
             #zero to simulate the result of original libwwz
-            # if dweight > 10 ** -9
-            dweight_mask = dweight > 10 ** -9
-            dweight_mask = ~dweight_mask
+#             if dweight > 10 ** -9
+            dweight_mask = dweight <= 10 ** -9
             dweight[dweight_mask] = 0 
             cos_dz: np.ndarray = np.cos(dz)
             sin_dz: np.ndarray = np.sin(dz)
             cos_dz[dweight_mask] = 0
             sin_dz[dweight_mask] = 0
                 
+            
             dweight2 = np.sum(dweight ** 2)
             dvarw = np.sum(dweight * magnitudes ** 2)
             dmat[0, 0] = np.sum(dweight)
@@ -408,7 +430,10 @@ def wwt(timestamps: np.ndarray,
             dvec[0] = np.sum(dweight * magnitudes)
             dvec[1] = np.sum(dweight * magnitudes * cos_dz)
             dvec[2] = np.sum(dweight * magnitudes * sin_dz)
-
+            
+#             returned.append(dvarw)###del
+            
+#             print(dvarw, )
             # Get dneff ("effective number" for weighted projection)
             if dweight2 > 0:
                 # This is equation 5-4 in the paper
@@ -428,14 +453,20 @@ def wwt(timestamps: np.ndarray,
                     dvarw = dvarw / dmat[0, 0]
                 else:
                     dvarw = 0.0
+                    
+#                 dvarw_list.append(dvarw)###del
 
                 # some initialize
                 dmat[0, 0] = 1.0
                 davew: float = dvec[0]
                 dvarw = dvarw - (davew ** 2)  # "weighted variation" eq. 5-9
+                
+#                 dvarw_list.append(dvarw)###del
 
                 if dvarw <= 0.0:
                     dvarw = 10 ** -12
+                    
+#                 dvarw_list.append(dvarw)###del
 
                 # avoid for loops
                 dmat[1, 0] = dmat[0, 1]
@@ -466,18 +497,28 @@ def wwt(timestamps: np.ndarray,
 
             if dpowz < (10 ** (-9)):
                 dpowz = 0.0
+                
 
             # Let's write everything out.
             output[index] = [dtau, dfreq, dpowz, damp, dcoef[0], dneff]
 
             index = index + 1
-
+            
+#             returned.append(dvarw_list)#del
+#         return returned#del
         return output
 
     # Check if parallel or not
     if parallel:
         output = np.array(Parallel(n_jobs=num_cores)(delayed(tau_loop)(dtau) for dtau in tau))
     else:
+        
+        ###del
+#         for i, dtau in enumerate(tau):
+#             tau_loop(dtau)
+#         return returned
+        ###del
+        
         output = np.empty([ntau, nfreq, 6])
         for i, dtau in enumerate(tau):
             output[i] = tau_loop(dtau)
