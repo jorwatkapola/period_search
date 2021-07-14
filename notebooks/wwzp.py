@@ -375,135 +375,89 @@ def wwt(timestamps: np.ndarray,
     # Get number of CPU cores on current device (used for parallel)
     num_cores = multiprocessing.cpu_count()
 
-    # WWT Stars Here
-    def tau_loop(dtau):
-        """
-        Replaced the for loop of the taus ("time shifts") for parallel processing.
-        Comments include connections to the formula given in the Foster96.
-        :param dtau: one of the taus being iterated
-        :return: a single entry of Tau, Freq, WWZ, AMP, COEF, NEFF corresponding to dtau
-        """
-        # Initialize the outputs for each iteration
-        index: int = 0
-#         output: np.ndarray = np.empty((len(freq), 6))
-        nstart: int = 0
-#         dvarw: float = 0.0
-            
-#         dvarw_list = [] ###del
+    # WWT Starts Here
+    dvec: np.ndarray = np.zeros((ntau, nfreq, 3))
+    dmat: np.ndarray = np.zeros((ntau, nfreq, 3, 3))
+    dweight2: np.ndarray = np.zeros((ntau, nfreq))
+    domega: np.ndarray = 2.0 * np.pi * freq
+    dz: np.ndarray = np.einsum('ij,k->ikj',(timestamps - tau[:,np.newaxis]), domega)
+    dweight: np.ndarray = np.exp(-1 * decay_constant * dz ** 2)
 
-        # loop over each interested "frequency" over the "time shifts"
-#         for dfreq in freq:
-            # Initialize a vector (3) and matrix (3,3) and dweight2 (sum of dweight**2)
-        dvec: np.ndarray = np.zeros((nfreq, 3))
-        dmat: np.ndarray = np.zeros((nfreq, 3, 3))
-        dweight2: np.ndarray = np.zeros(nfreq)
-        # Get Scale Factor (referred in paper as "frequency")
-        domega: np.ndarray = 2.0 * np.pi * freq
-                
-                        
-            # Discrete wavelet transform (DWT)
-            # Lots of math here, but basically doing the summations shown in the paper
-            # vectorise the loop going over idat 
-        dz: np.ndarray = np.outer(domega, (timestamps - dtau)) # matrix with size [domega,timestamps]
-        dweight: np.ndarray = np.exp(-1 * decay_constant * dz ** 2)
-            # in the loop values with weights less than 1E-9 would be
-            # excluded from the summation loop, so here we set them to
-            #zero to simulate the result of original libwwz
-#             if dweight > 10 ** -9
-        dweight_mask = dweight <= 10 ** -9
-        dweight[dweight_mask] = 0 
-        cos_dz: np.ndarray = np.cos(dz)
-        sin_dz: np.ndarray = np.sin(dz)
-        cos_dz[dweight_mask] = 0
-        sin_dz[dweight_mask] = 0
+    dweight_mask = dweight <= 10 ** -9
+    dweight[dweight_mask] = 0 
+    cos_dz: np.ndarray = np.cos(dz)
+    sin_dz: np.ndarray = np.sin(dz)
+    cos_dz[dweight_mask] = 0
+    sin_dz[dweight_mask] = 0
                 
             
-        dweight2 = np.sum(dweight ** 2, axis=1)
-        dvarw = np.sum(dweight * magnitudes ** 2, axis=1)
-        dmat[:, 0, 0] = np.sum(dweight, axis=1)
-        dmat[:, 0, 1] = np.sum(dweight * cos_dz, axis=1)
-        dmat[:, 0, 2] = np.sum(dweight * sin_dz, axis=1)
-        dmat[:, 1, 1] = np.sum(dweight * cos_dz ** 2, axis=1)
-        dmat[:, 1, 2] = np.sum(dweight * cos_dz * sin_dz, axis=1)
-        dmat[:, 2, 2] = np.sum(dweight * sin_dz ** 2, axis=1)
+    dweight2 = np.sum(dweight ** 2, axis=2)
+    dvarw = np.sum(dweight * magnitudes ** 2, axis=2)
+    dmat[:, :, 0, 0] = np.sum(dweight, axis=2)
+    dmat[:, :, 0, 1] = np.sum(dweight * cos_dz, axis=2)
+    dmat[:, :, 0, 2] = np.sum(dweight * sin_dz, axis=2)
+    dmat[:, :, 1, 1] = np.sum(dweight * cos_dz ** 2, axis=2)
+    dmat[:, :, 1, 2] = np.sum(dweight * cos_dz * sin_dz, axis=2)
+    dmat[:, :, 2, 2] = np.sum(dweight * sin_dz ** 2, axis=2)
 
-        # parallel to the 3 trial functions (5-5, 6, 7)
-        dvec[:, 0] = np.sum(dweight * magnitudes, axis=1)
-        dvec[:, 1] = np.sum(dweight * magnitudes * cos_dz, axis=1)
-        dvec[:, 2] = np.sum(dweight * magnitudes * sin_dz, axis=1)
+    dvec[:, :, 0] = np.sum(dweight * magnitudes, axis=2)
+    dvec[:, :, 1] = np.sum(dweight * magnitudes * cos_dz, axis=2)
+    dvec[:, :, 2] = np.sum(dweight * magnitudes * sin_dz, axis=2)
             
-#             returned.append(dvarw)###del
-            
-#             print(dvarw, )
-            # Get dneff ("effective number" for weighted projection)
-        dneff: np.ndarray = np.zeros(nfreq)
-        dneff[dweight2 > 0] = (dmat[:, 0, 0][dweight2 > 0] ** 2) / dweight2[dweight2 > 0]
+    dneff: np.ndarray = np.zeros((ntau,nfreq))
+    dneff[dweight2 > 0] = (dmat[:, :, 0, 0][dweight2 > 0] ** 2) / dweight2[dweight2 > 0]
 
-        dcoef: np.ndarray = np.zeros((nfreq, 3))
-        dpower: np.ndarray = np.zeros(nfreq)
-        dpowz: np.ndarray = np.zeros(nfreq)
-        damp: np.ndarray = np.zeros(nfreq)
+    dcoef: np.ndarray = np.zeros((ntau, nfreq, 3))
+    dpower: np.ndarray = np.zeros((ntau, nfreq))
+    dpowz: np.ndarray = np.zeros((ntau, nfreq))
+    damp: np.ndarray = np.zeros((ntau, nfreq))
         
         # boolean mask instead of the if statement
-        dneff_mask = dneff > 3 
-        dvec[dneff_mask,:] = (dvec[dneff_mask,:].T / dmat[dneff_mask, 0, 0]).T
-        dmat[dneff_mask, :, 1:] = (dmat[dneff_mask, :, 1:].T / dmat[dneff_mask, 0, 0]).T
-        dmat_mask = dmat[:, 0, 0] > 0.005 # S[0] > 0.0 in vartools?
-        dvarw[dmat_mask] = dvarw[dmat_mask] / dmat[dmat_mask, 0, 0]
-        dvarw[~dmat_mask] = 0.0
-        dmat[dneff_mask, 0, 0] = 1.0
-        davew: np.ndarray = dvec[:, 0]
-        dvarw = dvarw - (davew ** 2)
-        dvarw[dvarw <= 0.0] = 10 ** -12
-        dmat[dneff_mask, 1, 0] = dmat[dneff_mask, 0, 1] # could avoid using the mask perhaps
-        dmat[dneff_mask, 2, 0] = dmat[dneff_mask, 0, 2]
-        dmat[dneff_mask, 2, 1] = dmat[dneff_mask, 1, 2]
-        dmat[dneff_mask, :, :] = np.linalg.pinv(dmat[dneff_mask, :, :])
-        #dcoef[dneff_mask, :] = dmat[dneff_mask, :, :].dot(dvec[dneff_mask,:])  # y1, y2, and y3 from eq. 4-4, with 5-5, 6, 7
-        #ValueError: shapes (400,3,3) and (400,3) not aligned: 3 (dim 2) != 400 (dim 0)
-        dcoef[dneff_mask, :] = np.einsum('ijk,ik->ij', dmat[dneff_mask, :, :], dvec[dneff_mask,:])
-        #dpower = np.dot(dcoef[dneff_mask, :], dvec[dneff_mask, :]) - (davew[dneff_mask] ** 2)  # weighted model function eq. 5-10
-        #ValueError: shapes (400,3) and (400,3) not aligned: 3 (dim 1) != 400 (dim 0)
-        dpower[dneff_mask] = np.einsum('ij,ij->i',dcoef[dneff_mask, :], dvec[dneff_mask, :]) - (davew[dneff_mask] ** 2)
+    dneff_mask = dneff > 3 
+    dvec[dneff_mask,:] = (dvec[dneff_mask,:].T / dmat[dneff_mask, 0, 0]).T
+    dmat[dneff_mask, :, 1:] = (dmat[dneff_mask, :, 1:].T / dmat[dneff_mask, 0, 0]).T
+    dmat_mask = dmat[:, :, 0, 0] > 0.005 # S[0] > 0.0 in vartools?
+    dvarw[dmat_mask] = dvarw[dmat_mask] / dmat[dmat_mask, 0, 0]
+    dvarw[~dmat_mask] = 0.0
+    dmat[dneff_mask, 0, 0] = 1.0
+    davew: np.ndarray = dvec[:, :, 0]
+    dvarw = dvarw - (davew ** 2)
+    dvarw[dvarw <= 0.0] = 10 ** -12
+    dmat[dneff_mask, 1, 0] = dmat[dneff_mask, 0, 1] # could avoid using the mask perhaps
+    dmat[dneff_mask, 2, 0] = dmat[dneff_mask, 0, 2]
+    dmat[dneff_mask, 2, 1] = dmat[dneff_mask, 1, 2]
+    dmat[dneff_mask, :, :] = np.linalg.pinv(dmat[dneff_mask, :, :])
+    #dcoef[dneff_mask, :] = dmat[dneff_mask, :, :].dot(dvec[dneff_mask,:])  # y1, y2, and y3 from eq. 4-4, with 5-5, 6, 7
+    #ValueError: shapes (400,3,3) and (400,3) not aligned: 3 (dim 2) != 400 (dim 0)
+    dcoef[dneff_mask, :] = np.einsum('ijk,ik->ij', dmat[dneff_mask, :, :], dvec[dneff_mask,:])
+    #dpower = np.dot(dcoef[dneff_mask, :], dvec[dneff_mask, :]) - (davew[dneff_mask] ** 2)  # weighted model function eq. 5-10
+    #ValueError: shapes (400,3) and (400,3) not aligned: 3 (dim 1) != 400 (dim 0)
+    dpower[dneff_mask] = np.einsum('ij,ij->i',dcoef[dneff_mask, :], dvec[dneff_mask, :]) - (davew[dneff_mask] ** 2)
 #         print((dpowz.shape, dneff_mask.shape, dneff.shape, dpower.shape, dvarw.shape))
-        dpowz[dneff_mask] = (dneff[dneff_mask] - 3.0) * dpower[dneff_mask] / (2.0 * (dvarw[dneff_mask] - dpower[dneff_mask]))  # WWZ eq. 5-12
-        damp[dneff_mask] = np.sqrt(dcoef[dneff_mask, 1] ** 2 + dcoef[dneff_mask, 2] ** 2)  # WWA eq. 5-14
-        
-        dneff[dneff < 10e-9] = 0.0
-        damp[damp < 10e-9] = 0.0
-        dpowz[dpowz < 10e-9] = 0.0
-        
-#         print((tau.shape, freq.shape,dpowz.shape,damp.shape,dcoef[:,0].shape,dneff.shape))
-        return np.array([[dtau]*len(freq), freq, dpowz, damp, dcoef[:,0], dneff])
+    dpowz[dneff_mask] = (dneff[dneff_mask] - 3.0) * dpower[dneff_mask] / (2.0 * (dvarw[dneff_mask] - dpower[dneff_mask]))  # WWZ eq. 5-12
+    damp[dneff_mask] = np.sqrt(dcoef[dneff_mask, 1] ** 2 + dcoef[dneff_mask, 2] ** 2)  # WWA eq. 5-14
 
-    # Check if parallel or not
-    if parallel:
-        output = np.array(Parallel(n_jobs=num_cores)(delayed(tau_loop)(dtau) for dtau in tau))
-        output = np.moveaxis(output, 1, 2)
-    else:
+    dneff[dneff < 10e-9] = 0.0
+    damp[damp < 10e-9] = 0.0
+    dpowz[dpowz < 10e-9] = 0.0
         
-        ###del
-#         for i, dtau in enumerate(tau):
-#             tau_loop(dtau)
-#         return returned
-        ###del
+
         
-        output = np.empty([ntau, nfreq, 6])
-        for i, dtau in enumerate(tau):
-#             out_test = tau_loop(dtau)
-#             print(output[i, :, :].shape, out_test)
-            output[i] = tau_loop(dtau).T
+#     output = np.empty([6, ntau, nfreq])
 
-    # Format the output to be in len(tau) by len(freq) matrix for each value with correct labels
-#     print((output[:, :, 0].shape, output.shape))
-    tau_mat: np.ndarray = output[:, :, 0].reshape([ntau, nfreq])
-    freq_mat: np.ndarray = output[:, :, 1].reshape([ntau, nfreq])
-    wwz_mat: np.ndarray = output[:, :, 2].reshape([ntau, nfreq])
-    amp_mat: np.ndarray = output[:, :, 3].reshape([ntau, nfreq])
-    dcoef_mat: np.ndarray = output[:, :, 4].reshape([ntau, nfreq])
-    dneff_mat: np.ndarray = output[:, :, 5].reshape([ntau, nfreq])
+#     # Format the output to be in len(tau) by len(freq) matrix for each value with correct labels
+# #     print((output[:, :, 0].shape, output.shape))
+#     tau_mat: np.ndarray = output[:, :, 0].reshape([ntau, nfreq])
+#     freq_mat: np.ndarray = output[:, :, 1].reshape([ntau, nfreq])
+#     wwz_mat: np.ndarray = output[:, :, 2].reshape([ntau, nfreq])
+#     amp_mat: np.ndarray = output[:, :, 3].reshape([ntau, nfreq])
+#     dcoef_mat: np.ndarray = output[:, :, 4].reshape([ntau, nfreq])
+#     dneff_mat: np.ndarray = output[:, :, 5].reshape([ntau, nfreq])
 
-    output = np.array([tau_mat, freq_mat, wwz_mat, amp_mat, dcoef_mat, dneff_mat])
+#     for xxx in [np.tile(tau,(len(freq),1)).T, np.tile(freq, (len(tau),1)), dpowz, damp, dcoef[:, 0], dneff]:
+#         print(xxx.shape)
+
+    output = np.array([np.tile(tau,(len(freq),1)).T, np.tile(freq, (len(tau),1)), dpowz, damp, dcoef[:,:, 0], dneff])
 
     # Finished Weighted Wavelet Z-transform and finish timer...
     print(round(time.time() - process_starttime, 2), 'seconds has passed to complete Weighted Wavelet Z-transform \n')
