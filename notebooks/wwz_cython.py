@@ -346,9 +346,9 @@ def wwt(timestamps: np.ndarray,
     freq_pseudo_sr = 1 / np.median(np.diff(timestamps))  # 1 / median period
 
     # noinspection PyArgumentList
-    largest_tau_window = tau[1] - tau[0]
-    print('Pseudo sample frequency (median) is ', np.round(freq_pseudo_sr, 3))
-    print('largest tau window is ', np.round(largest_tau_window, 3))
+#     largest_tau_window = tau[1] - tau[0]
+#     print('Pseudo sample frequency (median) is ', np.round(freq_pseudo_sr, 3))
+#     print('largest tau window is ', np.round(largest_tau_window, 3))
 
     # Frequencies to compute WWZ
     if method == 'linear':
@@ -385,7 +385,7 @@ def wwt(timestamps: np.ndarray,
     dpowz: np.ndarray = np.zeros((ntau, nfreq))
     damp: np.ndarray = np.zeros((ntau, nfreq))
         
-        # boolean mask instead of the if statement
+    # boolean mask instead of the if statement
     dneff_mask = dneff > 3 
     dvec[dneff_mask,:] = (dvec[dneff_mask,:].T / dmat[dneff_mask, 0, 0]).T
     dmat[dneff_mask, :, 1:] = (dmat[dneff_mask, :, 1:].T / dmat[dneff_mask, 0, 0]).T
@@ -399,7 +399,12 @@ def wwt(timestamps: np.ndarray,
     dmat[dneff_mask, 1, 0] = dmat[dneff_mask, 0, 1] # could avoid using the mask perhaps
     dmat[dneff_mask, 2, 0] = dmat[dneff_mask, 0, 2]
     dmat[dneff_mask, 2, 1] = dmat[dneff_mask, 1, 2]
-    dmat[dneff_mask, :, :] = np.linalg.pinv(dmat[dneff_mask, :, :])
+    # use pseudoinverse if the determinant is 0, otherwise use the faster inverse function
+    det0_mask = (np.linalg.det(dmat[dneff_mask, :, :]) == 0).reshape(dneff_mask.shape)
+    dneff_det0_mask = np.logical_and(dneff_mask, det0_mask)
+    dneff_det1_mask = np.logical_and(dneff_mask, ~det0_mask)
+    dmat[dneff_det0_mask, :, :] = np.linalg.pinv(dmat[dneff_det0_mask, :, :])
+    dmat[dneff_det1_mask, :, :] = np.linalg.inv(dmat[dneff_det1_mask, :, :])
     #dcoef[dneff_mask, :] = dmat[dneff_mask, :, :].dot(dvec[dneff_mask,:])  # y1, y2, and y3 from eq. 4-4, with 5-5, 6, 7
     #ValueError: shapes (400,3,3) and (400,3) not aligned: 3 (dim 2) != 400 (dim 0)
     dcoef[dneff_mask, :] = np.einsum('ijk,ik->ij', dmat[dneff_mask, :, :], dvec[dneff_mask,:])

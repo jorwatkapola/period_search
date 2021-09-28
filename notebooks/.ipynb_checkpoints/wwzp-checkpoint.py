@@ -10,7 +10,7 @@ import numpy as np
 from joblib import Parallel, delayed
 import multiprocessing
 import time
-
+# import torch
 
 def make_tau(timestamps: np.ndarray,
              time_divisions: int) -> np.ndarray:
@@ -376,7 +376,7 @@ def wwt(timestamps: np.ndarray,
     num_cores = multiprocessing.cpu_count()
 
     # WWT Starts Here
-    dvec: np.ndarray = np.zeros((ntau, nfreq, 3))
+    dvec: np.ndarray = np.zeros((ntau, nfreq, 3), dtype=np.double)
     dmat: np.ndarray = np.zeros((ntau, nfreq, 3, 3))
     dweight2: np.ndarray = np.zeros((ntau, nfreq))
     domega: np.ndarray = 2.0 * np.pi * freq

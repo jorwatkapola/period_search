@@ -10,7 +10,7 @@ import numpy as np
 from joblib import Parallel, delayed
 import multiprocessing
 import time
-import torch
+# import torch
 
 def make_tau(timestamps: np.ndarray,
              time_divisions: int) -> np.ndarray:
