@@ -1,0 +1,11 @@
+# create a new environment and add it to jupyter notebook kernels
+conda create --name fingerprint_env python=3.5
+conda install -c anaconda jupyter
+conda install ipykernel
+python -m ipykernel install --user --name wavelet_env --display-name "wavelet_env"
+
+# install packages
+conda install numpy matplotlib scikit-learn pandas
+conda install -c conda-forge fbprophet
+conda install -c anaconda cython
+conda install -c conda-forge gcc

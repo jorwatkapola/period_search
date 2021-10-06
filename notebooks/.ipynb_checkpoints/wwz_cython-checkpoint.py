@@ -399,7 +399,8 @@ def wwt(timestamps: np.ndarray,
     dmat[dneff_mask, 1, 0] = dmat[dneff_mask, 0, 1] # could avoid using the mask perhaps
     dmat[dneff_mask, 2, 0] = dmat[dneff_mask, 0, 2]
     dmat[dneff_mask, 2, 1] = dmat[dneff_mask, 1, 2]
-    det0_mask = (np.linalg.det(dmat[dneff_mask, :, :]) == 0).reshape(dneff_mask.shape)
+    # use pseudoinverse if the determinant is 0, otherwise use the faster inverse function
+    det0_mask = (np.linalg.det(dmat[:, :, :]) == 0).reshape(dneff_mask.shape)
     dneff_det0_mask = np.logical_and(dneff_mask, det0_mask)
     dneff_det1_mask = np.logical_and(dneff_mask, ~det0_mask)
     dmat[dneff_det0_mask, :, :] = np.linalg.pinv(dmat[dneff_det0_mask, :, :])
